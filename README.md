@@ -10,6 +10,7 @@ A collection of useful agentic coding configurations and skills for easy syncing
 - `skills/` - Pi agent skills for enhanced capabilities
   - `brave-search/` - Web search via Brave Search API
   - `frontend-design/` - Distinctive frontend interface design
+  - `github/` - GitHub CLI (`gh`) for issues, PRs, CI runs, and API queries
   - `oracle/` - Second-model review using @steipete/oracle CLI
   - `tmux/` - Remote control tmux sessions
   - `web-browser/` - Puppeteer-based web browsing via CDP (requires `npm i` in scripts/)
