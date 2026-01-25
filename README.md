@@ -12,6 +12,7 @@ A collection of useful agentic coding configurations and skills for easy syncing
   - `frontend-design/` - Distinctive frontend interface design
   - `oracle/` - Second-model review using @steipete/oracle CLI
   - `tmux/` - Remote control tmux sessions
+  - `web-browser/` - Puppeteer-based web browsing via CDP (requires `npm i` in scripts/)
 
 ## Installation
 
