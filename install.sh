@@ -70,7 +70,35 @@ if [ -d "$COMMANDS_SRC" ]; then
     done
 fi
 
+# --- Install Extensions ---
+EXTENSIONS_SRC="$SCRIPT_DIR/pi-extensions"
+EXTENSIONS_DST="$HOME/.pi/agent/extensions"
+
+if [ -d "$EXTENSIONS_SRC" ]; then
+    mkdir -p "$EXTENSIONS_DST"
+    echo ""
+    echo "Installing extensions..."
+    
+    for ext_file in "$EXTENSIONS_SRC"/*.ts; do
+        [ -f "$ext_file" ] || continue
+        ext_name=$(basename "$ext_file")
+        src="$ext_file"
+        dst="$EXTENSIONS_DST/$ext_name"
+        
+        if [ -L "$dst" ]; then
+            rm "$dst"
+        elif [ -f "$dst" ]; then
+            echo "  Warning: $dst exists and is not a symlink. Skipping."
+            continue
+        fi
+        
+        echo "  Linking: $ext_name"
+        ln -s "$src" "$dst"
+    done
+fi
+
 echo ""
 echo "Done!"
-echo "  Skills:   $SKILLS_DST"
-echo "  Commands: $COMMANDS_DST"
+echo "  Skills:     $SKILLS_DST"
+echo "  Commands:   $COMMANDS_DST"
+echo "  Extensions: $EXTENSIONS_DST"
