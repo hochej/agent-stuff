@@ -7,6 +7,9 @@ A collection of useful agentic coding configurations and skills for easy syncing
 - `commands/` - Custom slash commands
   - `handoff.md` - `/handoff` Creates detailed handoff plan for session continuation
   - `pickup.md` - `/pickup` Resumes work from previous handoff session
+- `pi-extensions/` - Pi extensions for enhanced functionality
+  - `review.ts` - `/review` command for code review (uncommitted, branch, commit, custom). Ctrl+R shortcut.
+  - `todos.ts` - `/todos` command for file-based todo management
 - `skills/` - Pi agent skills for enhanced capabilities
   - `brave-search/` - Web search via Brave Search API
   - `frontend-design/` - Distinctive frontend interface design
