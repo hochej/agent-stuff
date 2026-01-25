@@ -4,6 +4,9 @@ A collection of useful agentic coding configurations and skills for easy syncing
 
 ## Contents
 
+- `commands/` - Custom slash commands
+  - `handoff.md` - `/handoff` Creates detailed handoff plan for session continuation
+  - `pickup.md` - `/pickup` Resumes work from previous handoff session
 - `skills/` - Pi agent skills for enhanced capabilities
   - `brave-search/` - Web search via Brave Search API
   - `frontend-design/` - Distinctive frontend interface design
@@ -20,7 +23,9 @@ cd ~/dev/agent-stuff
 ./install.sh
 ```
 
-This will symlink the skills to `~/.pi/agent/skills/`.
+This will symlink:
+- Skills to `~/.pi/agent/skills/`
+- Commands to `~/.pi/agent/commands/`
 
 ## Updating
 
