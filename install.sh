@@ -43,20 +43,20 @@ if [ -d "$SKILLS_SRC" ]; then
     done
 fi
 
-# --- Install Commands ---
+# --- Install Prompt Templates (commands/*.md -> prompts/) ---
 COMMANDS_SRC="$SCRIPT_DIR/commands"
-COMMANDS_DST="$HOME/.pi/agent/commands"
+PROMPTS_DST="$HOME/.pi/agent/prompts"
 
 if [ -d "$COMMANDS_SRC" ]; then
-    mkdir -p "$COMMANDS_DST"
+    mkdir -p "$PROMPTS_DST"
     echo ""
-    echo "Installing commands..."
+    echo "Installing prompt templates..."
     
     for cmd_file in "$COMMANDS_SRC"/*.md; do
         [ -f "$cmd_file" ] || continue
         cmd_name=$(basename "$cmd_file")
         src="$cmd_file"
-        dst="$COMMANDS_DST/$cmd_name"
+        dst="$PROMPTS_DST/$cmd_name"
         
         if [ -L "$dst" ]; then
             rm "$dst"
@@ -135,6 +135,6 @@ fi
 echo ""
 echo "Done!"
 echo "  Skills:     $SKILLS_DST"
-echo "  Commands:   $COMMANDS_DST"
+echo "  Prompts:    $PROMPTS_DST"
 echo "  Bin:        $BIN_DST"
 echo "  Extensions: $EXTENSIONS_DST"
