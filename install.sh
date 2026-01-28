@@ -70,6 +70,41 @@ if [ -d "$COMMANDS_SRC" ]; then
     done
 fi
 
+# --- Install Bin Scripts ---
+BIN_SRC="$SCRIPT_DIR/bin"
+BIN_DST="$HOME/.local/bin"
+
+if [ -d "$BIN_SRC" ]; then
+    mkdir -p "$BIN_DST"
+    echo ""
+    echo "Installing bin scripts..."
+    
+    for bin_file in "$BIN_SRC"/*; do
+        [ -f "$bin_file" ] || continue
+        bin_name=$(basename "$bin_file")
+        src="$bin_file"
+        dst="$BIN_DST/$bin_name"
+        
+        if [ -L "$dst" ]; then
+            rm "$dst"
+        elif [ -f "$dst" ]; then
+            echo "  Warning: $dst exists and is not a symlink. Skipping."
+            continue
+        fi
+        
+        echo "  Linking: $bin_name"
+        ln -s "$src" "$dst"
+    done
+    
+    # Check if ~/.local/bin is in PATH
+    if [[ ":$PATH:" != *":$BIN_DST:"* ]]; then
+        echo ""
+        echo "  Note: $BIN_DST is not in your PATH."
+        echo "  Add this to your shell profile:"
+        echo "    export PATH=\"\$HOME/.local/bin:\$PATH\""
+    fi
+fi
+
 # --- Install Extensions ---
 EXTENSIONS_SRC="$SCRIPT_DIR/pi-extensions"
 EXTENSIONS_DST="$HOME/.pi/agent/extensions"
@@ -101,4 +136,5 @@ echo ""
 echo "Done!"
 echo "  Skills:     $SKILLS_DST"
 echo "  Commands:   $COMMANDS_DST"
+echo "  Bin:        $BIN_DST"
 echo "  Extensions: $EXTENSIONS_DST"
