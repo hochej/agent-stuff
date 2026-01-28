@@ -2,6 +2,12 @@ Lands a pull request by rebasing it onto main, running the full gate (lint, buil
 
 The user specified PR: `$ARGUMENTS`
 
+If no PR number was provided, check if there's a current PR for the branch or list open PRs:
+```
+gh pr list --state open
+```
+Ask the user which PR to land.
+
 ## Process
 
 1. Repo clean: `git status`
