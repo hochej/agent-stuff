@@ -41,6 +41,7 @@ across machines.
   proposals, and specs
 - `frontend-design/` - Distinctive, production-grade frontend interface design
 - `github/` - GitHub CLI (`gh`) for issues, PRs, CI runs, and API queries
+- `google-web-search/` - Real-time web search via Gemini API with grounding
 - `kapitan/` - Operate Kapitan configuration management projects
 - `kueue/` - Manage Kueue, the Kubernetes-native job queuing system
 - `oracle/` - Second-model review using @steipete/oracle CLI

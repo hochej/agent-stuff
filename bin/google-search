@@ -1,0 +1,23 @@
+#!/bin/bash
+# Wrapper for the Gemini Google Search grounding skill
+
+# Ensure API Key is loaded if ~/.secrets exists
+if [ -f "$HOME/.secrets" ]; then
+    source "$HOME/.secrets"
+fi
+
+if [ -z "$GEMINI_API_KEY" ]; then
+    echo "Error: GEMINI_API_KEY is not set. Please set it in ~/.secrets or your environment."
+    exit 1
+fi
+
+# Determine the directory of this script to find the skill
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+SKILL_SCRIPT="$REPO_ROOT/skills/google-web-search/scripts/example.py"
+
+if [ $# -eq 0 ]; then
+    echo "Usage: google-search \"your search query\""
+    exit 1
+fi
+
+uv run --with "google-genai>=1.5.0" --with "pydantic-settings" "$SKILL_SCRIPT" "$@"
