@@ -22,6 +22,8 @@ across machines.
 
 - `answer.ts` - Q&A extraction hook with interactive TUI for answering questions
   from assistant responses
+- `litellm-budget.ts` - Auto-detect LiteLLM backends and show budget/spend in the
+  footer status line (`Budget: $spent/$limit/duration (%)`)
 - `plan-mode/` - Read-only exploration mode (`/plan` or Ctrl+Alt+P) restricting
   tools to safe read-only commands
 - `review.ts` - `/review` command for code review (uncommitted, branch, commit,
