@@ -114,6 +114,7 @@ if [ -d "$EXTENSIONS_SRC" ]; then
     echo ""
     echo "Installing extensions..."
     
+    # Install single-file extensions (*.ts)
     for ext_file in "$EXTENSIONS_SRC"/*.ts; do
         [ -f "$ext_file" ] || continue
         ext_name=$(basename "$ext_file")
@@ -129,6 +130,33 @@ if [ -d "$EXTENSIONS_SRC" ]; then
         
         echo "  Linking: $ext_name"
         ln -s "$src" "$dst"
+    done
+    
+    # Install package extensions (directories with package.json)
+    for ext_dir in "$EXTENSIONS_SRC"/*/; do
+        [ -d "$ext_dir" ] || continue
+        [ -f "$ext_dir/package.json" ] || continue
+        ext_name=$(basename "$ext_dir")
+        src="$EXTENSIONS_SRC/$ext_name"
+        dst="$EXTENSIONS_DST/$ext_name"
+        
+        if [ -L "$dst" ]; then
+            echo "  Removing existing symlink: $dst"
+            rm "$dst"
+        elif [ -d "$dst" ]; then
+            echo "  Warning: $dst exists and is not a symlink. Skipping."
+            echo "           Remove it manually if you want to use the repo version."
+            continue
+        fi
+        
+        echo "  Linking: $ext_name"
+        ln -s "$src" "$dst"
+        
+        # Install npm dependencies if needed
+        if [ -f "$src/package.json" ] && [ ! -d "$src/node_modules" ]; then
+            echo "    Installing npm dependencies for $ext_name..."
+            (cd "$src" && npm install --silent)
+        fi
     done
 fi
 

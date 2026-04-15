@@ -15,5 +15,5 @@ Thumbs.db
 # Logs
 *.log
 
-# Lock files (optional - uncomment if you want to track them)
-# package-lock.json
+# Lock files
+package-lock.json
