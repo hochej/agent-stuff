@@ -11,7 +11,7 @@
  */
 
 import { complete, type Model, type Api, type UserMessage } from "@mariozechner/pi-ai";
-import type { ExtensionAPI, ExtensionContext } from "@mariozechner/pi-coding-agent";
+import type { ExtensionAPI, ExtensionContext, ModelRegistry } from "@mariozechner/pi-coding-agent";
 import { BorderedLoader } from "@mariozechner/pi-coding-agent";
 import {
 	type Component,
@@ -71,34 +71,50 @@ const CODEX_MODEL_ID = "gpt-5.1-codex-mini";
 const HAIKU_MODEL_ID = "claude-haiku-4-5";
 
 /**
+ * Resolve API key (and optional headers) for a model using the current
+ * ModelRegistry API. Returns undefined if the model has no usable auth.
+ */
+async function resolveModelAuth(
+	modelRegistry: ModelRegistry,
+	model: Model<Api>,
+): Promise<{ apiKey?: string; headers?: Record<string, string> } | undefined> {
+	try {
+		const auth = await modelRegistry.getApiKeyAndHeaders(model);
+		if (auth?.ok) {
+			return { apiKey: auth.apiKey, headers: auth.headers };
+		}
+	} catch {
+		// fall through to provider-level lookup
+	}
+	try {
+		const apiKey = await modelRegistry.getApiKeyForProvider(model.provider);
+		if (apiKey) {
+			return { apiKey };
+		}
+	} catch {
+		// no auth available
+	}
+	return undefined;
+}
+
+/**
  * Prefer Codex mini for extraction when available, otherwise fallback to haiku or the current model.
  */
 async function selectExtractionModel(
 	currentModel: Model<Api>,
-	modelRegistry: {
-		find: (provider: string, modelId: string) => Model<Api> | undefined;
-		getApiKey: (model: Model<Api>) => Promise<string | undefined>;
-	},
+	modelRegistry: ModelRegistry,
 ): Promise<Model<Api>> {
 	const codexModel = modelRegistry.find("openai-codex", CODEX_MODEL_ID);
-	if (codexModel) {
-		const apiKey = await modelRegistry.getApiKey(codexModel);
-		if (apiKey) {
-			return codexModel;
-		}
+	if (codexModel && modelRegistry.hasConfiguredAuth(codexModel)) {
+		return codexModel;
 	}
 
 	const haikuModel = modelRegistry.find("anthropic", HAIKU_MODEL_ID);
-	if (!haikuModel) {
-		return currentModel;
+	if (haikuModel && modelRegistry.hasConfiguredAuth(haikuModel)) {
+		return haikuModel;
 	}
 
-	const apiKey = await modelRegistry.getApiKey(haikuModel);
-	if (!apiKey) {
-		return currentModel;
-	}
-
-	return haikuModel;
+	return currentModel;
 }
 
 /**
@@ -457,7 +473,7 @@ export default function (pi: ExtensionAPI) {
 				loader.onAbort = () => done(null);
 
 				const doExtract = async () => {
-					const apiKey = await ctx.modelRegistry.getApiKey(extractionModel);
+					const auth = await resolveModelAuth(ctx.modelRegistry, extractionModel);
 					const userMessage: UserMessage = {
 						role: "user",
 						content: [{ type: "text", text: lastAssistantText! }],
@@ -467,7 +483,11 @@ export default function (pi: ExtensionAPI) {
 					const response = await complete(
 						extractionModel,
 						{ systemPrompt: SYSTEM_PROMPT, messages: [userMessage] },
-						{ apiKey, signal: loader.signal },
+						{
+							apiKey: auth?.apiKey,
+							headers: auth?.headers,
+							signal: loader.signal,
+						},
 					);
 
 					if (response.stopReason === "aborted") {
@@ -489,7 +509,7 @@ export default function (pi: ExtensionAPI) {
 				return loader;
 			});
 
-			if (extractionResult === null) {
+			if (!extractionResult) {
 				ctx.ui.notify("Cancelled", "info");
 				return;
 			}
@@ -504,7 +524,7 @@ export default function (pi: ExtensionAPI) {
 				return new QnAComponent(extractionResult.questions, tui, done);
 			});
 
-			if (answersResult === null) {
+			if (!answersResult) {
 				ctx.ui.notify("Cancelled", "info");
 				return;
 			}
